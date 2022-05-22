@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SupervisorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,12 +18,27 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+Route::middleware('supervisor:supervisor')->group(function(){
+    Route::get('supervisor/login',[SupervisorController::class,'loginForm']);
+    Route::post('supervisor/login',[SupervisorController::class,'store'])->name('supervisor.login');
+});
+
+
+Route::middleware(['auth:sanctum,supervisor',config('jetstream.auth_session'),'verified'])->group(function () {
+    Route::get('/supervisor/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard')->middleware('auth:supervisor');
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Route::middleware('admin:admin')->group(function(){
     Route::get('admin/login',[AdminController::class,'loginForm']);
     Route::post('admin/login',[AdminController::class,'store'])->name('admin.login');
 });
+
 
 Route::middleware(['auth:sanctum,admin',config('jetstream.auth_session'),'verified'])->group(function () {
     Route::get('/admin/dashboard', function () {
@@ -30,9 +46,12 @@ Route::middleware(['auth:sanctum,admin',config('jetstream.auth_session'),'verifi
     })->name('dashboard')->middleware('auth:admin');
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
 });
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
