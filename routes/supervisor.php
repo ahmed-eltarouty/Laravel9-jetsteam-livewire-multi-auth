@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SupervisorController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,20 +14,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+
+
+
+Route::middleware('supervisor:supervisor')->group(function(){
+    Route::get('supervisor/login',[SupervisorController::class,'loginForm']);
+    Route::post('supervisor/login',[SupervisorController::class,'store'])->name('supervisor.login');
 });
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified'])->group(function () {
-    Route::get('/dashboard', function () {
+Route::middleware(['auth:sanctum,supervisor',config('jetstream.auth_session'),'verified'])->group(function () {
+    Route::get('/supervisor/dashboard', function () {
         return view('dashboard');
-    })->name('dashboard');
+    })->name('dashboard')->middleware('auth:supervisor');
 });
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
